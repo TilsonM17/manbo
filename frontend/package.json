@@ -1,5 +1,5 @@
 {
-  "name": "mambo-front",
+  "name": "frontend",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -9,9 +9,10 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "next": "14.2.5",
     "react": "^18",
-    "react-dom": "^18",
-    "next": "14.2.5"
+    "react-beautiful-dnd": "^13.1.1",
+    "react-dom": "^18"
   },
   "devDependencies": {
     "postcss": "^8",
