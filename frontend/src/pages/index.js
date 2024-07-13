@@ -3,7 +3,6 @@ import {
   DragDropContext,
   Draggable,
   Droppable,
-  resetServerContext,
 } from "react-beautiful-dnd";
 import Column from "@/components/Column/Column";
 
@@ -103,23 +102,21 @@ export default function Home() {
         const sourceCollumId = source.droppableId;
         const destineCollumId = destination.droppableId;
 
-        const newSourceItemsCollection = getItemById(data, sourceCollumId).itemsOrder
-        const newDestItemsCollection = getItemById(data, destineCollumId).itemsOrder
+        const sourceItemsCollection = getItemById(data, sourceCollumId)
+        const destItemsCollection = getItemById(data, destineCollumId)
 
-        console.log(newSourceItemsCollection, newDestItemsCollection)
-        // const newSourceItemsCollection = [...data[sourceCollumId].itemsOrder];
-        // const new_dest_items_id_collc = [...data[destineCollumId].itemsOrder];
+        const newSourceItemsCollection = [...sourceItemsCollection.itemsOrder];
+        const newDestItemsCollection   = [...destItemsCollection.itemsOrder];
         
         const [deleted_item_id] = newSourceItemsCollection.splice(sourceIndex,1);
         newDestItemsCollection.splice(destinationIndex, 0, deleted_item_id);
 
         const new_data = { ...data };
-        new_data[sourceCollumId].itemsOrder = newSourceItemsCollection;
-        new_data[destineCollumId].itemsOrder = newDestItemsCollection;
+        
+        new_data[getItemById(data, sourceCollumId).title].itemsOrder = newSourceItemsCollection;
+        new_data[getItemById(data, destineCollumId).title].itemsOrder = newDestItemsCollection;
 
         setData(new_data);
-
-        //update the db
     }
   };
 
