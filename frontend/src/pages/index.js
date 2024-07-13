@@ -1,118 +1,178 @@
-import Image from "next/image";
-import { Inter } from "next/font/google";
+import { useState, useEffect } from "react";
+import {
+  DragDropContext,
+  Draggable,
+  Droppable,
+  resetServerContext,
+} from "react-beautiful-dnd";
+import Column from "@/components/Column/Column";
 
-const inter = Inter({ subsets: ["latin"] });
+const INITIAL_COLUMN_ORDER = ["Pending", "In Progress", "Testing", "Done"];
+
+const INITIAL_COL_DATA = {
+  Pending: {
+    id: "pending",
+    title: "Pending",
+    itemsOrder: ["item-1", "item-2", "item-3"],
+  },
+  "In Progress": {
+    id: "in_progress",
+    title: "In Progress",
+    itemsOrder: ["item-4", "item-5"],
+  },
+  "Testing": {
+    id: "testing",
+    title: "Testing",
+    itemsOrder: ["item-6", "item-7", "item-8"],
+  },
+
+  "Done": {
+    id: "done",
+    title: "Done",
+    itemsOrder: [],
+  },
+};
+
+const ITEMS = {
+  "item-1": {
+    id: "item-1",
+    title: "Item 1",
+  },
+  "item-2": {
+    id: "item-2",
+    title: "Item 2",
+  },
+  "item-3": {
+    id: "item-3",
+    title: "Item 3",
+  },
+  "item-4": {
+    id: "item-4",
+    title: "Item 4",
+  },
+  "item-5": {
+    id: "item-5",
+    title: "Item 5",
+  },
+  "item-6": {
+    id: "item-6",
+    title: "Item 6",
+  },
+  "item-7": {
+    id: "item-7",
+    title: "Item 7",
+  },
+  "item-8": {
+    id: "item-8",
+    title: "Item 8",
+  },
+};
 
 export default function Home() {
+  const [columnsOrder] = useState(INITIAL_COLUMN_ORDER);
+  const [data, setData] = useState(INITIAL_COL_DATA);
+  const [winReady, setwinReady] = useState(false);
+  
+  useEffect(() => {
+    setwinReady(true);
+  }, []);
+
+  const handleDragDrop = (results) => {
+    const { source, destination, type } = results;
+
+    if (!destination) 
+      return;
+
+    if (source.droppableId === destination.droppableId && source.index === destination.index)
+       return;
+
+    const sourceIndex = source.index;
+    const destinationIndex = destination.index;
+
+    if (type === "DEFAULT") {
+
+      function getItemById(data, searchId) {
+        for (const key in data) {
+          if (data[key].id === searchId) {
+            return data[key];
+          }
+        }
+        return null;
+      }
+
+        const sourceCollumId = source.droppableId;
+        const destineCollumId = destination.droppableId;
+
+        const newSourceItemsCollection = getItemById(data, sourceCollumId).itemsOrder
+        const newDestItemsCollection = getItemById(data, destineCollumId).itemsOrder
+
+        console.log(newSourceItemsCollection, newDestItemsCollection)
+        // const newSourceItemsCollection = [...data[sourceCollumId].itemsOrder];
+        // const new_dest_items_id_collc = [...data[destineCollumId].itemsOrder];
+        
+        const [deleted_item_id] = newSourceItemsCollection.splice(sourceIndex,1);
+        newDestItemsCollection.splice(destinationIndex, 0, deleted_item_id);
+
+        const new_data = { ...data };
+        new_data[sourceCollumId].itemsOrder = newSourceItemsCollection;
+        new_data[destineCollumId].itemsOrder = newDestItemsCollection;
+
+        setData(new_data);
+
+        //update the db
+    }
+  };
+
   return (
-    <main
-      className={`flex min-h-screen flex-col items-center justify-between p-24 ${inter.className}`}
-    >
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/pages/index.js</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
+    <div className="flex h-full w-full items-center  flex-col">
+      <p className="font-bold text-4xl bg-gradient-to-r from-purple-600 via-blue-400 to-indigo-400  mt-10 text-transparent bg-clip-text">
+        Mambo Kamban
+      </p>
+      <DragDropContext onDragEnd={handleDragDrop}>
+        <Droppable droppableId="ROOT" type="COLUMN" direction="HORIZONTAL">
+          {(provided) => (
+            <div
+              className="flex  items-center w-full md:max-w-10xl justify-center border min-h-96 py-4 mt-6 rounded-md overflow-x-scroll md:overflow-hidden"
+              {...provided.droppableProps}
+              ref={provided.innerRef}
+            >
+              {columnsOrder.map((colId, index) => {
+                const columnData = data[colId];
+                return (
+                  <Draggable
+                    draggableId={columnData.id}
+                    key={columnData.id}
+                    index={index}
+                  >
+                    {(provided) => (
+                      <div
+                        className="rounded-md border flex flex-col max-w-xs mx-3"
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                      >
+                        <div
+                          {...provided.dragHandleProps}
+                          className="flex items-center justify-between w-80 gap-2 hover:bg-gray-600 p-4 border-b border-b-gray-700 rounded-t-md"
+                        >
+                          <p className="text-xl font-bold">
+                            {columnData.title}
+                          </p>
+                        </div>
 
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-full sm:before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full sm:after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700/10 after:dark:from-sky-900 after:dark:via-[#0141ff]/40 before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Discover and deploy boilerplate example Next.js&nbsp;projects.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50 text-balance`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+                        {winReady ? (
+                          <Column {...columnData} ITEMS={ITEMS} />
+                        ) : null}
+                      </div>
+                    )}
+                  </Draggable>
+                );
+              })}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
+    </div>
   );
 }
