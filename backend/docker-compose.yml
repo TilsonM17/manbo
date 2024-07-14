@@ -2,7 +2,6 @@ version: '3'
 
 services:
   app:
-    image: docker-node-app
     build:
       context: .
       dockerfile: Dockerfile
@@ -11,7 +10,7 @@ services:
       NODE_ENV: development
       MONGO_URI: mongodb://app-db:27017/docker-node-app
     ports:
-      - '8089:8089'
+      - 8082:8082
     depends_on:
       - app-db
 
