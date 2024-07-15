@@ -38,7 +38,7 @@ export default function Home() {
 
   const fetchTasks = async () => {
     try {
-      const response = await axios.get(`http://localhost:8082/api/tasks`);
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URI}/api/tasks`);
       const tasks = response.data;
 
       const columnsData = INITIAL_COLUMN_ORDER.reduce((acc, status) => {
@@ -73,7 +73,7 @@ export default function Home() {
 
   const addTask = async (title, description, status) => {
     try {
-       await axios.post(`http://localhost:8082/api/tasks`, {
+       await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URI}/api/tasks`, {
         title,
         description,
         status,
@@ -86,7 +86,7 @@ export default function Home() {
 
   const editTask = async (taskId, title, description, newStatus) => {
     try {
-      await axios.put(`http://localhost:8082/api/tasks/${taskId}`, {
+      await axios.put(`${process.env.NEXT_PUBLIC_BACKEND_URI}/api/tasks/${taskId}`, {
         title: title,
         description: description,
         status: newStatus,
@@ -100,7 +100,7 @@ export default function Home() {
 
   const deleteTask = async (taskId) => {
     try {
-      await axios.delete(`http://localhost:8082/api/tasks/${taskId}`);
+      await axios.delete(`${process.env.NEXT_PUBLIC_BACKEND_URI}/api/tasks/${taskId}`);
       fetchTasks();
     } catch (error) {
       console.error("Error deleting task:", error);
@@ -109,7 +109,7 @@ export default function Home() {
 
   const updateTaskStatus = async (taskId, newStatus) => {
     try {
-      await axios.put(`http://localhost:8082/api/tasks/${taskId}`, {
+      await axios.put(`${process.env.NEXT_PUBLIC_BACKEND_URI}/api/tasks/${taskId}`, {
         status: newStatus,
       });
     } catch (error) {
