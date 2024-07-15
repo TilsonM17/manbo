@@ -1,14 +1,14 @@
 const mongoose = require("mongoose");
+const dotenv = require("dotenv");
+dotenv.config();
 
 const connectDB = async () => {
   try {
-    await mongoose.connect("mongodb://localhost:27017/docker-node-app");
+    await mongoose.connect(process.env.MONGO_URI);
     console.log("MongoDB connected");
   } catch (error) {
-    console.error(error);
+    console.error("MongoDB connection error:", error);
   }
 };
-
-connectDB();
 
 module.exports = connectDB;
