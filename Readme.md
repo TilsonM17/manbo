@@ -14,7 +14,7 @@ Na api, o uso do Docker é totalmente opcional, o docker-compose no projeto apen
 1 - Copie o projeto na sua máquina.
 
 ```sh
-git clone [Url] 
+git clone https://github.com/TilsonM17/manbo.git
 ```
 
 
