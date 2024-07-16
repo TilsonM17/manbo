@@ -38,7 +38,7 @@ MONGO_URI='mongodb://localhost:27017/'
 
 ```
 
-> Caso não tenha o Mongo Instalado pode usar o docker.
+> Por favor, certifique-se de que o Mongo esta ativo e funcional e que passou corretamente a String de conexão.
 
 4 - Instale as dependências e rode o projeto.
 
@@ -70,7 +70,7 @@ NEXT_PUBLIC_BACKEND_URI='http://localhost:8082'
 7 - Instale as dependências e rode o projeto.
 
 ```
- npm install; npm run build
+ npm install; npm run build; npm run dev
 ```
 
 Depois de tudo, acesse o endereço do projeto, e __enjoy the moment__.
