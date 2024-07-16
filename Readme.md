@@ -24,8 +24,7 @@ git clone https://github.com/TilsonM17/manbo.git
 2 - Acesse a pasta **backend** e copie a variável de ambiente
 
 ```sh
- cd project/backend
- cp .env.example .env
+cd manbo/backend; cp .env.example .env
 ```
 
 3 - Defina as Variáveis de ambiente e configure a QueryString
